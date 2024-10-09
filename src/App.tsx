@@ -10,6 +10,9 @@ const App: React.FC = () => {
 
   useEffect(() => {
     WebApp.ready();
+    try {
+      WebApp.requestWriteAccess();
+    } catch (error) {}
     const startParam = WebApp.initDataUnsafe.start_param;
     if (startParam) {
       const [type, chainId, hash] = startParam.split('_');
