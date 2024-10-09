@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import WebApp from '@twa-dev/sdk';
 import HelloPage from './HelloPage';
 import TransactionPage from './TransactionPage';
 import AddressPage from './AddressPage';
@@ -8,16 +9,14 @@ const App: React.FC = () => {
   const [startRoute, setStartRoute] = useState<string | null>(null);
 
   useEffect(() => {
-    if (window.Telegram.WebApp) {
-      window.Telegram.WebApp.ready();
-      const startParam = window.Telegram.WebApp.initDataUnsafe.start_param;
-      if (startParam) {
-        const [type, hash] = startParam.split('_');
-        if (type === 'addr') {
-          setStartRoute(`/address/${hash}`);
-        } else if (type === 'tx') {
-          setStartRoute(`/transaction/${hash}`);
-        }
+    WebApp.ready();
+    const startParam = WebApp.initDataUnsafe.start_param;
+    if (startParam) {
+      const [type, hash] = startParam.split('_');
+      if (type === 'addr') {
+        setStartRoute(`/address/${hash}`);
+      } else if (type === 'tx') {
+        setStartRoute(`/transaction/${hash}`);
       }
     }
   }, []);
