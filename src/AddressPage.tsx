@@ -21,7 +21,7 @@ interface Token {
 
 const AddressPage: React.FC = () => {
   const [searchParams] = useSearchParams();
-  const chainId = searchParams.get('chainId') || 1;
+  const chainId = searchParams.get('chainId') || '1';
   const addressHash = searchParams.get('hash') || '';
   const [addressData, setAddressData] = useState<AddressData | null>(null);
   const [tokens, setTokens] = useState<Token[]>([]);
@@ -85,12 +85,17 @@ const AddressPage: React.FC = () => {
     fetchData();
   }, [addressHash, chainId]);
 
-  if (loading) return <PageContainer title="Address Details"><div className="p-4 text-center">Loading...</div></PageContainer>;
-  if (error) return <PageContainer title="Address Details"><div className="p-4 text-center text-red-500">{error}</div></PageContainer>;
-  if (!addressData) return <PageContainer title="Address Details"><div className="p-4 text-center">No data found</div></PageContainer>;
+  if (loading) return <PageContainer title="Address Details" showSearchButton><div className="p-4 text-center">Loading...</div></PageContainer>;
+  if (error) return <PageContainer title="Address Details" showSearchButton><div className="p-4 text-center text-red-500">{error}</div></PageContainer>;
+  if (!addressData) return <PageContainer title="Address Details" showSearchButton><div className="p-4 text-center">No data found</div></PageContainer>;
 
   return (
-    <PageContainer title="Address Details">
+    <PageContainer
+      title="Address Details"
+      showSearchButton
+      showShareButton
+      shareLink={'t.me/blockscout_test_bot/bs_test_app'}
+    >
       <div className="p-4 border-b">
         <h2 className="text-lg font-semibold mb-2">Overview</h2>
         <div className="grid grid-cols-1 gap-2">

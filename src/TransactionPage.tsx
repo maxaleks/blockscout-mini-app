@@ -18,39 +18,38 @@ interface Transaction {
 
 const TransactionPage: React.FC = () => {
   const [searchParams] = useSearchParams();
-  const chainId = searchParams.get('chainId') || 1;
+  const chainId = searchParams.get('chainId') || '1';
   const txHash = searchParams.get('hash') || '';
   const [transaction, setTransaction] = useState<Transaction | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const fetchTransactionData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const network = networks[chainId];
+        if (!network) {
+          throw new Error('Invalid network');
+        }
+        const response = await fetch(`${network.apiEndpoint}/transactions/${txHash}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch transaction data');
+        }
+        const data = await response.json();
+        setTransaction(data);
+      } catch (err) {
+        setError('Error fetching transaction data.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (txHash) {
-      fetchTransactionData(txHash);
+      fetchTransactionData();
     }
   }, [txHash, chainId]);
-
-  const fetchTransactionData = async (hash: string) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const network = networks[chainId];
-      if (!network) {
-        throw new Error('Invalid network');
-      }
-      const response = await fetch(`${network.apiEndpoint}/transactions/${hash}`);
-      const data = await response.json();
-      if (data) {
-        setTransaction(data);
-      } else {
-        setError('Transaction not found or error in API response');
-      }
-    } catch (err) {
-      setError('Error fetching transaction data.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const formatTimestamp = (timestamp: string): [string, string] => {
     const date = new Date(timestamp);
@@ -85,12 +84,17 @@ const TransactionPage: React.FC = () => {
     return `${formattedValue} ${network.symbol}`;
   };
 
-  if (loading) return <PageContainer title="Transaction Details"><div className="p-4 text-center">Loading...</div></PageContainer>;
-  if (error) return <PageContainer title="Transaction Details"><div className="p-4 text-center text-red-500">{error}</div></PageContainer>;
-  if (!transaction) return <PageContainer title="Transaction Details"><div className="p-4 text-center">No data found</div></PageContainer>;
+  if (loading) return <PageContainer title="Transaction Details" showSearchButton><div className="p-4 text-center">Loading...</div></PageContainer>;
+  if (error) return <PageContainer title="Transaction Details" showSearchButton><div className="p-4 text-center text-red-500">{error}</div></PageContainer>;
+  if (!transaction) return <PageContainer title="Transaction Details" showSearchButton><div className="p-4 text-center">No data found</div></PageContainer>;
 
   return (
-    <PageContainer title="Transaction Details">
+    <PageContainer
+      title="Transaction Details"
+      showSearchButton
+      showShareButton
+      shareLink={'t.me/blockscout_test_bot/bs_test_app'}
+    >
       <div className="p-4">
         <div className="mb-4">
           <span className="font-bold">Hash:</span>
