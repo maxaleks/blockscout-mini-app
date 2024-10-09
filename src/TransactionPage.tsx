@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import networks from './networks';
 import PageContainer from './PageContainer';
 
@@ -17,7 +17,9 @@ interface Transaction {
 }
 
 const TransactionPage: React.FC = () => {
-  const { hash: txHash } = useParams<{ hash: string }>();
+  const [searchParams] = useSearchParams();
+  const chainId = searchParams.get('chainId') || 1;
+  const txHash = searchParams.get('hash') || '';
   const [transaction, setTransaction] = useState<Transaction | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,13 +28,17 @@ const TransactionPage: React.FC = () => {
     if (txHash) {
       fetchTransactionData(txHash);
     }
-  }, [ txHash ]);
+  }, [txHash, chainId]);
 
   const fetchTransactionData = async (hash: string) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`https://eth.blockscout.com/api/v2/transactions/${hash}`);
+      const network = networks[chainId];
+      if (!network) {
+        throw new Error('Invalid network');
+      }
+      const response = await fetch(`${network.apiEndpoint}/transactions/${hash}`);
       const data = await response.json();
       if (data) {
         setTransaction(data);
@@ -71,8 +77,8 @@ const TransactionPage: React.FC = () => {
     return [timeAgo, formattedDate];
   };
 
-  const formatValue = (value: string, networkId: number): string => {
-    const network = networks[networkId];
+  const formatValue = (value: string): string => {
+    const network = networks[chainId];
     if (!network) return value;
 
     const formattedValue = (parseFloat(value) / Math.pow(10, network.decimals)).toFixed(6);
@@ -105,12 +111,12 @@ const TransactionPage: React.FC = () => {
         </div>
         <div className="mb-4">
           <span className="font-bold">Value:</span>
-          <div>{formatValue(transaction.value, 1)}</div>
+          <div>{formatValue(transaction.value)}</div>
         </div>
         {/* Add more transaction details as needed */}
         <div className="text-center mt-6">
           <a
-            href={`https://eth.blockscout.com/tx/${transaction.hash}`}
+            href={`${networks[chainId].apiEndpoint}/tx/${transaction.hash}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-500 hover:text-blue-700 underline"

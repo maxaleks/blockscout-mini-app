@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import WebApp from '@twa-dev/sdk';
-import HelloPage from './HelloPage';
+import StartPage from './StartPage';
 import TransactionPage from './TransactionPage';
 import AddressPage from './AddressPage';
 
@@ -12,25 +12,21 @@ const App: React.FC = () => {
     WebApp.ready();
     const startParam = WebApp.initDataUnsafe.start_param;
     if (startParam) {
-      const [type, hash] = startParam.split('_');
+      const [type, chainId, hash] = startParam.split('_');
       if (type === 'addr') {
-        setStartRoute(`/address/${hash}`);
+        setStartRoute(`/address?chainId=${chainId}&hash=${hash}`);
       } else if (type === 'tx') {
-        setStartRoute(`/transaction/${hash}`);
+        setStartRoute(`/transaction?chainId=${chainId}&hash=${hash}`);
       }
     }
   }, []);
 
-  if (startRoute === null) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <Router>
       <Routes>
-        <Route path="/" element={startRoute ? <Navigate to={startRoute} /> : <HelloPage />} />
-        <Route path="/transaction/:hash" element={<TransactionPage />} />
-        <Route path="/address/:address" element={<AddressPage />} />
+        <Route path="/" element={startRoute ? <Navigate to={startRoute} /> : <StartPage />} />
+        <Route path="/transaction" element={<TransactionPage />} />
+        <Route path="/address" element={<AddressPage />} />
       </Routes>
     </Router>
   );

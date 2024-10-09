@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
+import networks from './networks';
 import PageContainer from './PageContainer';
 
 interface AddressData {
@@ -19,7 +20,9 @@ interface Token {
 }
 
 const AddressPage: React.FC = () => {
-  const { address } = useParams<{ address: string }>();
+  const [searchParams] = useSearchParams();
+  const chainId = searchParams.get('chainId') || 1;
+  const addressHash = searchParams.get('hash') || '';
   const [addressData, setAddressData] = useState<AddressData | null>(null);
   const [tokens, setTokens] = useState<Token[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,9 +43,14 @@ const AddressPage: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const network = networks[chainId];
+        if (!network) {
+          throw new Error('Invalid network');
+        }
+
         const [addressResponse, tokensResponse] = await Promise.all([
-          fetch(`https://eth.blockscout.com/api/v2/addresses/${address}`),
-          fetch(`https://eth.blockscout.com/api/v2/addresses/${address}/tokens?type=ERC-20`)
+          fetch(`${network.apiEndpoint}/addresses/${addressHash}`),
+          fetch(`${network.apiEndpoint}/addresses/${addressHash}/tokens?type=ERC-20`)
         ]);
 
         if (!addressResponse.ok || !tokensResponse.ok) {
@@ -75,7 +83,7 @@ const AddressPage: React.FC = () => {
     };
 
     fetchData();
-  }, [address]);
+  }, [addressHash, chainId]);
 
   if (loading) return <PageContainer title="Address Details"><div className="p-4 text-center">Loading...</div></PageContainer>;
   if (error) return <PageContainer title="Address Details"><div className="p-4 text-center text-red-500">{error}</div></PageContainer>;
@@ -90,9 +98,9 @@ const AddressPage: React.FC = () => {
             <span className="font-medium">Hash:</span> {addressData.hash}
           </div>
           <div>
-            <span className="font-medium">Balance:</span> {formatBalance(addressData.coin_balance)} ETH
+            <span className="font-medium">Balance:</span> {formatBalance(addressData.coin_balance, networks[chainId].decimals)} {networks[chainId].symbol}
             <span className="text-gray-500 ml-1">
-              (${formatUsdValue(calculateUsdValue(addressData.coin_balance, addressData.exchange_rate))})
+              (${formatUsdValue(calculateUsdValue(addressData.coin_balance, addressData.exchange_rate, networks[chainId].decimals))})
             </span>
           </div>
         </div>
