@@ -66,7 +66,7 @@ const PageContainer: React.FC<PageContainerProps> = ({
     <div className="p-4 max-w-2xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         {showSearchButton ? (
-          <button onClick={handleSearch} className="p-2 rounded-full bg-gray-200 hover:bg-gray-300">
+          <button onClick={handleSearch} className="p-2 rounded-full border-blue-500">
             <Search size={20} />
           </button>
         ) : <div className="w-9"></div>}
@@ -75,12 +75,12 @@ const PageContainer: React.FC<PageContainerProps> = ({
           { networkLogo && <img src={networkLogo} alt={title} className="w-6 h-6" /> }
         </div>
         {showShareButton ? (
-          <button onClick={handleShare} className="p-2 rounded-full bg-gray-200 hover:bg-gray-300">
+          <button onClick={handleShare} className="p-2 rounded-full border-blue-500">
             <Share size={20} />
           </button>
         ) : <div className="w-9"></div>}
       </div>
-      <div className="bg-white shadow-md rounded-lg overflow-hidden">
+      <div className="bg-white overflow-hidden">
         {children}
       </div>
     </div>
