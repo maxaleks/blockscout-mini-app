@@ -25,7 +25,11 @@ const AddressPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const chainId = Number(searchParams.get('chainId') || '1');
   const addressHash = searchParams.get('hash') || '';
-  const [addressData, setAddressData] = useState<AddressData | null>(null);
+  const [addressData, setAddressData] = useState<AddressData>({
+    coin_balance: '0',
+    hash: '',
+    exchange_rate: '0'
+  });
   const [tokens, setTokens] = useState<Token[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,11 +39,11 @@ const AddressPage: React.FC = () => {
   };
 
   const formatBalance = (balance: string, decimals: number = 18): string => {
-    return (parseFloat(balance) / Math.pow(10, decimals)).toFixed(4);
+    return (parseFloat(balance) / Math.pow(10, decimals)).toFixed(4) || '0';
   };
 
   const formatUsdValue = (usdValue: number): string => {
-    return usdValue.toFixed(2);
+    return usdValue.toFixed(2) || '0';
   };
 
   useEffect(() => {
@@ -68,7 +72,7 @@ const AddressPage: React.FC = () => {
           .filter((token: Token) => {
             const exchangeRate = parseFloat(token.token.exchange_rate);
             const usdBalance = calculateUsdValue(token.value, token.token.exchange_rate, parseInt(token.token.decimals));
-            return exchangeRate > 0 && usdBalance > 0;
+            return exchangeRate > 0 && usdBalance > 0.001;
           })
           .sort((a: Token, b: Token) => {
             const aUsdBalance = calculateUsdValue(a.value, a.token.exchange_rate, parseInt(a.token.decimals));
@@ -77,8 +81,10 @@ const AddressPage: React.FC = () => {
           });
 
         setTokens(filteredAndSortedTokens);
-      } catch (err) {
-        setError('An error occurred while fetching data');
+      } catch (err: { message: string } | any) {
+        if (err?.message === 'Not found') {
+          setError('An error occurred while fetching data');
+        }
       } finally {
         setLoading(false);
       }
@@ -103,7 +109,7 @@ const AddressPage: React.FC = () => {
             <h2 className="text-lg font-semibold mb-2">Overview</h2>
             <div className="grid grid-cols-1 gap-2">
               <div>
-                <span className="font-medium">Hash:</span> {shortenHash(addressData.hash)}
+                <span className="font-medium">Hash:</span> {shortenHash(addressHash)}
               </div>
               <div>
                 <span className="font-medium">Balance:</span> {formatBalance(addressData.coin_balance, networks[chainId].decimals)} {networks[chainId].symbol}
@@ -113,7 +119,7 @@ const AddressPage: React.FC = () => {
               </div>
               <div className="text-center mt-1">
                 <a
-                  href={`${networks[chainId].explorerUrl}/address/${addressData.hash}`}
+                  href={`${networks[chainId].explorerUrl}/address/${addressHash}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-500 hover:text-blue-700 underline"
