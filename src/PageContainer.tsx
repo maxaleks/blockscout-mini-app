@@ -6,7 +6,7 @@ import { Search, Share } from 'lucide-react';
 import { API_ENDPOINT } from './constants';
 
 interface PageContainerProps {
-  title: string;
+  title?: string;
   children: ReactNode;
   networkLogo?: string;
   showSearchButton?: boolean;
@@ -15,6 +15,8 @@ interface PageContainerProps {
     hash: string;
     chainId: number;
   };
+  loading?: boolean;
+  error?: string | null;
 }
 
 const PageContainer: React.FC<PageContainerProps> = ({
@@ -23,7 +25,9 @@ const PageContainer: React.FC<PageContainerProps> = ({
   networkLogo,
   showSearchButton = false,
   showShareButton = false,
-  shareData
+  shareData,
+  loading = false,
+  error = null
 }) => {
   const navigate = useNavigate();
 
@@ -40,7 +44,7 @@ const PageContainer: React.FC<PageContainerProps> = ({
         throw new Error('User ID not available');
       }
 
-      const response = await fetch(`${ API_ENDPOINT }/generate`, {
+      const response = await fetch(`${API_ENDPOINT}/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -52,7 +56,6 @@ const PageContainer: React.FC<PageContainerProps> = ({
         throw new Error('Failed to generate share link');
       }
 
-
       const { id } = await response.json();
       const shareUrl = `https://t.me/blockscout_test_bot/bs_test_app?startapp=${id}`;
       WebApp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}`);
@@ -63,26 +66,42 @@ const PageContainer: React.FC<PageContainerProps> = ({
   };
 
   return (
-    <div className="p-4 max-w-2xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
-        {showSearchButton ? (
-          <button onClick={handleSearch} className="p-2 rounded-full border-blue-500">
-            <Search size={20} />
-          </button>
-        ) : <div className="w-9"></div>}
-        <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold">{title}</h1>
-          { networkLogo && <img src={networkLogo} alt={title} className="w-6 h-6" /> }
+    <div className="flex flex-col min-h-screen">
+      <div className="flex justify-between items-center p-4 h-[60px]">
+        {title && (
+          <>
+            {showSearchButton ? (
+              <button onClick={handleSearch} className="p-2 rounded-full border-blue-500">
+                <Search size={20} />
+              </button>
+            ) : <div className="w-9"></div>}
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-bold">{title}</h1>
+              {networkLogo && <img src={networkLogo} alt={title} className="w-6 h-6" />}
+            </div>
+            {showShareButton ? (
+              <button onClick={handleShare} className="p-2 rounded-full border-blue-500">
+                <Share size={20} />
+              </button>
+            ) : <div className="w-9"></div>}
+          </>
+        )}
+      </div>
+      {loading ? (
+        <div className="flex-grow flex items-center justify-center">
+          <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-b-4 border-blue-500 mb-12"></div>
         </div>
-        {showShareButton ? (
-          <button onClick={handleShare} className="p-2 rounded-full border-blue-500">
-            <Share size={20} />
-          </button>
-        ) : <div className="w-9"></div>}
-      </div>
-      <div className="bg-white overflow-hidden">
-        {children}
-      </div>
+      ) : (
+        <div className="flex-grow flex p-2">
+          {error ? (
+            <div className="text-center text-red-500">{error}</div>
+          ) : (
+            <div className="w-full max-w-md">
+              {children}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

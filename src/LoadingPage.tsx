@@ -1,10 +1,12 @@
 import React from 'react';
+import PageContainer from './PageContainer';
 
 const LoadingPage: React.FC = () => {
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-white">
-      <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
-    </div>
+    <PageContainer loading={true}>
+      {/* This children prop is required but won't be rendered due to loading={true} */}
+      <div></div>
+    </PageContainer>
   );
 };
 

@@ -86,10 +86,6 @@ const TransactionPage: React.FC = () => {
     return `${formattedValue} ${network.symbol}`;
   };
 
-  if (loading) return <PageContainer title="Transaction" networkLogo={networks[chainId].logoUrl} showSearchButton><div className="p-4 text-center">Loading...</div></PageContainer>;
-  if (error) return <PageContainer title="Transaction" networkLogo={networks[chainId].logoUrl} showSearchButton><div className="p-4 text-center text-red-500">{error}</div></PageContainer>;
-  if (!transaction) return <PageContainer title="Transaction" networkLogo={networks[chainId].logoUrl} showSearchButton><div className="p-4 text-center">No data found</div></PageContainer>;
-
   return (
     <PageContainer
       title="Transaction"
@@ -97,36 +93,40 @@ const TransactionPage: React.FC = () => {
       showSearchButton
       showShareButton
       shareData={{ hash: txHash, chainId }}
+      loading={loading}
+      error={error}
     >
-      <div className="p-4">
-        <div className="mb-4">
-          <span className="font-bold">Hash:</span> {shortenHash(transaction.hash, 10)}
+      {transaction && (
+        <div className="p-4">
+          <div className="mb-4">
+            <span className="font-bold">Hash:</span> {shortenHash(transaction.hash, 10)}
+          </div>
+          <div className="mb-4">
+            <span className="font-bold">Timestamp:</span> {formatTimestamp(transaction.timestamp)[0]}
+            <div>{formatTimestamp(transaction.timestamp)[1]}</div>
+          </div>
+          <div className="mb-4">
+            <span className="font-bold">From:</span> {shortenHash(transaction.from.hash)}
+          </div>
+          <div className="mb-4">
+            <span className="font-bold">To:</span> {shortenHash(transaction.to.hash)}
+          </div>
+          <div className="mb-4">
+            <span className="font-bold">Value:</span> {formatValue(transaction.value)}
+          </div>
+          {/* Add more transaction details as needed */}
+          <div className="text-center mt-6">
+            <a
+              href={`${networks[chainId].explorerUrl}/tx/${transaction.hash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 hover:text-blue-700 underline"
+            >
+              View on Blockscout
+            </a>
+          </div>
         </div>
-        <div className="mb-4">
-          <span className="font-bold">Timestamp:</span> {formatTimestamp(transaction.timestamp)[0]}
-          <div>{formatTimestamp(transaction.timestamp)[1]}</div>
-        </div>
-        <div className="mb-4">
-          <span className="font-bold">From:</span> {shortenHash(transaction.from.hash)}
-        </div>
-        <div className="mb-4">
-          <span className="font-bold">To:</span> {shortenHash(transaction.to.hash)}
-        </div>
-        <div className="mb-4">
-          <span className="font-bold">Value:</span> {formatValue(transaction.value)}
-        </div>
-        {/* Add more transaction details as needed */}
-        <div className="text-center mt-6">
-          <a
-            href={`${networks[chainId].explorerUrl}/tx/${transaction.hash}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 hover:text-blue-700 underline"
-          >
-            View on Blockscout
-          </a>
-        </div>
-      </div>
+      )}
     </PageContainer>
   );
 };

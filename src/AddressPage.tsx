@@ -87,10 +87,6 @@ const AddressPage: React.FC = () => {
     fetchData();
   }, [addressHash, chainId]);
 
-  if (loading) return <PageContainer title="Address" networkLogo={networks[chainId].logoUrl} showSearchButton><div className="p-4 text-center">Loading...</div></PageContainer>;
-  if (error) return <PageContainer title="Address" networkLogo={networks[chainId].logoUrl} showSearchButton><div className="p-4 text-center text-red-500">{error}</div></PageContainer>;
-  if (!addressData) return <PageContainer title="Address" networkLogo={networks[chainId].logoUrl} showSearchButton><div className="p-4 text-center">No data found</div></PageContainer>;
-
   return (
     <PageContainer
       title="Address"
@@ -98,56 +94,62 @@ const AddressPage: React.FC = () => {
       showSearchButton
       showShareButton
       shareData={{ hash: addressHash, chainId}}
+      loading={loading}
+      error={error}
     >
-      <div className="p-4 border-b">
-        <h2 className="text-lg font-semibold mb-2">Overview</h2>
-        <div className="grid grid-cols-1 gap-2">
-          <div>
-            <span className="font-medium">Hash:</span> {shortenHash(addressData.hash)}
+      {addressData && (
+        <>
+          <div className="p-4 border-b">
+            <h2 className="text-lg font-semibold mb-2">Overview</h2>
+            <div className="grid grid-cols-1 gap-2">
+              <div>
+                <span className="font-medium">Hash:</span> {shortenHash(addressData.hash)}
+              </div>
+              <div>
+                <span className="font-medium">Balance:</span> {formatBalance(addressData.coin_balance, networks[chainId].decimals)} {networks[chainId].symbol}
+                <span className="text-gray-500 ml-1">
+                  (${formatUsdValue(calculateUsdValue(addressData.coin_balance, addressData.exchange_rate, networks[chainId].decimals))})
+                </span>
+              </div>
+              <div className="text-center mt-1">
+                <a
+                  href={`${networks[chainId].explorerUrl}/address/${addressData.hash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-500 hover:text-blue-700 underline"
+                >
+                  View on Blockscout
+                </a>
+              </div>
+            </div>
           </div>
-          <div>
-            <span className="font-medium">Balance:</span> {formatBalance(addressData.coin_balance, networks[chainId].decimals)} {networks[chainId].symbol}
-            <span className="text-gray-500 ml-1">
-              (${formatUsdValue(calculateUsdValue(addressData.coin_balance, addressData.exchange_rate, networks[chainId].decimals))})
-            </span>
+          <div className="p-4">
+            <h2 className="text-lg font-semibold mb-2">Tokens</h2>
+            <div className="overflow-y-auto max-h-96">
+              {tokens.length > 0 ? (
+                <ul className="divide-y">
+                  {tokens.map((token, index) => {
+                    const tokenUsdValue = calculateUsdValue(token.value, token.token.exchange_rate, parseInt(token.token.decimals));
+                    return (
+                      <li key={index} className="py-2">
+                        <div className="font-medium">{token.token.symbol}</div>
+                        <div>
+                          {formatBalance(token.value, parseInt(token.token.decimals))}
+                          <span className="text-gray-500 ml-1">
+                            (${formatUsdValue(tokenUsdValue)})
+                          </span>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <p className="text-center text-gray-500">No tokens found with non-zero balance and exchange rate</p>
+              )}
+            </div>
           </div>
-          <div className="text-center mt-1">
-            <a
-              href={`${networks[chainId].explorerUrl}/address/${addressData.hash}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-500 hover:text-blue-700 underline"
-            >
-              View on Blockscout
-            </a>
-          </div>
-        </div>
-      </div>
-      <div className="p-4">
-        <h2 className="text-lg font-semibold mb-2">Tokens</h2>
-        <div className="overflow-y-auto max-h-96">
-          {tokens.length > 0 ? (
-            <ul className="divide-y">
-              {tokens.map((token, index) => {
-                const tokenUsdValue = calculateUsdValue(token.value, token.token.exchange_rate, parseInt(token.token.decimals));
-                return (
-                  <li key={index} className="py-2">
-                    <div className="font-medium">{token.token.symbol}</div>
-                    <div>
-                      {formatBalance(token.value, parseInt(token.token.decimals))}
-                      <span className="text-gray-500 ml-1">
-                        (${formatUsdValue(tokenUsdValue)})
-                      </span>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          ) : (
-            <p className="text-center text-gray-500">No tokens found with non-zero balance and exchange rate</p>
-          )}
-        </div>
-      </div>
+        </>
+      )}
     </PageContainer>
   );
 };
