@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import WebApp from '@twa-dev/sdk';
-import { Search, Share2 } from 'lucide-react';
+import { Search, Share } from 'lucide-react';
 
 import { API_ENDPOINT } from './constants';
 
@@ -76,7 +76,7 @@ const PageContainer: React.FC<PageContainerProps> = ({
         </div>
         {showShareButton ? (
           <button onClick={handleShare} className="p-2 rounded-full bg-gray-200 hover:bg-gray-300">
-            <Share2 size={20} />
+            <Share size={20} />
           </button>
         ) : <div className="w-9"></div>}
       </div>
