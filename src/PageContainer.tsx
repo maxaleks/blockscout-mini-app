@@ -1,7 +1,7 @@
 import React, { ReactNode, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import WebApp from '@twa-dev/sdk';
-import { Search, Share } from 'lucide-react';
+import { Search, Share, Loader2 } from 'lucide-react';
 
 interface PageContainerProps {
   title?: string;
@@ -101,7 +101,9 @@ const PageContainer: React.FC<PageContainerProps> = ({
       <div className="flex-grow overflow-y-auto">
         {loading ? (
           <div className="flex p-2 pt-24 justify-center">
-            <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-b-4 border-blue-500"></div>
+            <div className="animate-spin">
+              <Loader2 size={40} />
+            </div>
           </div>
         ) : (
           <div className="h-full">
