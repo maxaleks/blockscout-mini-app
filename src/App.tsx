@@ -27,17 +27,22 @@ const Content: React.FC = () => {
 
       try {
         const userId = WebApp.initDataUnsafe.user?.id.toString();
-        const response = await fetch(`${API_ENDPOINT}/info`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ id: startParam, userId }),
-        });
-        if (!response.ok) {
+        const [infoResponse] = await Promise.all([
+          fetch(`${API_ENDPOINT}/info`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: startParam, userId }),
+          }),
+          fetch(`${API_ENDPOINT}/info/saveId`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: userId }),
+          }),
+        ]);
+        if (!infoResponse.ok) {
           throw new Error('Failed to fetch start parameter info');
         }
-        const { hash, chainId } = await response.json();
+        const { hash, chainId } = await infoResponse.json();
         if (hash.length === 42) {
           navigate(`/address?chainId=${chainId}&hash=${hash}`);
         } else if (hash.length === 66) {
