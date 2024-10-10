@@ -111,7 +111,7 @@ const AddressPage: React.FC = () => {
               (${formatUsdValue(calculateUsdValue(addressData.coin_balance, addressData.exchange_rate, networks[chainId].decimals))})
             </span>
           </div>
-          <div className="text-center mt-6">
+          <div className="text-center mt-1">
             <a
               href={`${networks[chainId].explorerUrl}/address/${addressData.hash}`}
               target="_blank"
