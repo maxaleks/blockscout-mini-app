@@ -87,13 +87,14 @@ const AddressPage: React.FC = () => {
     fetchData();
   }, [addressHash, chainId]);
 
-  if (loading) return <PageContainer title="Address Details" showSearchButton><div className="p-4 text-center">Loading...</div></PageContainer>;
-  if (error) return <PageContainer title="Address Details" showSearchButton><div className="p-4 text-center text-red-500">{error}</div></PageContainer>;
-  if (!addressData) return <PageContainer title="Address Details" showSearchButton><div className="p-4 text-center">No data found</div></PageContainer>;
+  if (loading) return <PageContainer title="Address" networkLogo={networks[chainId].logoUrl} showSearchButton><div className="p-4 text-center">Loading...</div></PageContainer>;
+  if (error) return <PageContainer title="Address" networkLogo={networks[chainId].logoUrl} showSearchButton><div className="p-4 text-center text-red-500">{error}</div></PageContainer>;
+  if (!addressData) return <PageContainer title="Address" networkLogo={networks[chainId].logoUrl} showSearchButton><div className="p-4 text-center">No data found</div></PageContainer>;
 
   return (
     <PageContainer
-      title="Address Details"
+      title="Address"
+      networkLogo={networks[chainId].logoUrl}
       showSearchButton
       showShareButton
       shareData={{ hash: addressHash, chainId}}

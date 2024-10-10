@@ -8,6 +8,7 @@ import { API_ENDPOINT } from './constants';
 interface PageContainerProps {
   title: string;
   children: ReactNode;
+  networkLogo?: string;
   showSearchButton?: boolean;
   showShareButton?: boolean;
   shareData?: {
@@ -19,6 +20,7 @@ interface PageContainerProps {
 const PageContainer: React.FC<PageContainerProps> = ({
   title,
   children,
+  networkLogo,
   showSearchButton = false,
   showShareButton = false,
   shareData
@@ -68,7 +70,10 @@ const PageContainer: React.FC<PageContainerProps> = ({
             <Search size={20} />
           </button>
         ) : <div className="w-9"></div>}
-        <h1 className="text-2xl font-bold">{title}</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-bold">{title}</h1>
+          { networkLogo && <img src={networkLogo} alt={title} className="w-6 h-6" /> }
+        </div>
         {showShareButton ? (
           <button onClick={handleShare} className="p-2 rounded-full bg-gray-200 hover:bg-gray-300">
             <Share2 size={20} />

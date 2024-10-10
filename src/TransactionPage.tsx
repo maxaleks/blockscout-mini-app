@@ -86,13 +86,14 @@ const TransactionPage: React.FC = () => {
     return `${formattedValue} ${network.symbol}`;
   };
 
-  if (loading) return <PageContainer title="Transaction Details" showSearchButton><div className="p-4 text-center">Loading...</div></PageContainer>;
-  if (error) return <PageContainer title="Transaction Details" showSearchButton><div className="p-4 text-center text-red-500">{error}</div></PageContainer>;
-  if (!transaction) return <PageContainer title="Transaction Details" showSearchButton><div className="p-4 text-center">No data found</div></PageContainer>;
+  if (loading) return <PageContainer title="Transaction" networkLogo={networks[chainId].logoUrl} showSearchButton><div className="p-4 text-center">Loading...</div></PageContainer>;
+  if (error) return <PageContainer title="Transaction" networkLogo={networks[chainId].logoUrl} showSearchButton><div className="p-4 text-center text-red-500">{error}</div></PageContainer>;
+  if (!transaction) return <PageContainer title="Transaction" networkLogo={networks[chainId].logoUrl} showSearchButton><div className="p-4 text-center">No data found</div></PageContainer>;
 
   return (
     <PageContainer
-      title="Transaction Details"
+      title="Transaction"
+      networkLogo={networks[chainId].logoUrl}
       showSearchButton
       showShareButton
       shareData={{ hash: txHash, chainId }}
