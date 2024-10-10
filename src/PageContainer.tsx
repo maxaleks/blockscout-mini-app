@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import WebApp from '@twa-dev/sdk';
 import { Search, Share } from 'lucide-react';
@@ -30,6 +30,7 @@ const PageContainer: React.FC<PageContainerProps> = ({
   error = null
 }) => {
   const navigate = useNavigate();
+  const [logoLoaded, setLogoLoaded] = useState(false);
 
   const handleSearch = () => {
     navigate('/');
@@ -77,7 +78,19 @@ const PageContainer: React.FC<PageContainerProps> = ({
             ) : <div className="w-9"></div>}
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold">{title}</h1>
-              {networkLogo && <img src={networkLogo} alt={title} className="w-6 h-6" />}
+              {networkLogo && (
+                <div className="w-6 h-6 relative">
+                  {!logoLoaded && (
+                    <div className="absolute inset-0 bg-gray-200 rounded-full animate-pulse"></div>
+                  )}
+                  <img
+                    src={networkLogo}
+                    alt={title}
+                    className={`w-full h-full object-contain ${logoLoaded ? 'opacity-100' : 'opacity-0'}`}
+                    onLoad={() => setLogoLoaded(true)}
+                  />
+                </div>
+              )}
             </div>
             {showShareButton ? (
               <button onClick={handleShare} className="p-2 rounded-full border-blue-500">
@@ -88,8 +101,8 @@ const PageContainer: React.FC<PageContainerProps> = ({
         )}
       </div>
       {loading ? (
-        <div className="flex-grow flex items-center justify-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-b-4 border-blue-500 mb-12"></div>
+        <div className="flex-grow flex p-2 pt-24 justify-center">
+          <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-b-4 border-blue-500"></div>
         </div>
       ) : (
         <div className="flex-grow flex p-2">
