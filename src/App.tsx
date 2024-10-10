@@ -6,8 +6,6 @@ import TransactionPage from './TransactionPage';
 import AddressPage from './AddressPage';
 import LoadingPage from './LoadingPage';
 
-import { API_ENDPOINT } from './constants';
-
 const Content: React.FC = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
@@ -28,12 +26,12 @@ const Content: React.FC = () => {
       try {
         const userId = WebApp.initDataUnsafe.user?.id.toString();
         const [infoResponse] = await Promise.all([
-          fetch(`${API_ENDPOINT}/info`, {
+          fetch(`${import.meta.env.VITE_API_ENDPOINT}/info`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: startParam, userId }),
           }),
-          fetch(`${API_ENDPOINT}/info/saveId`, {
+          fetch(`${import.meta.env.VITE_API_ENDPOINT}/info/saveId`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: userId }),

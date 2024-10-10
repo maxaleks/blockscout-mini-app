@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import WebApp from '@twa-dev/sdk';
 import { Search, Share } from 'lucide-react';
 
-import { API_ENDPOINT } from './constants';
-
 interface PageContainerProps {
   title?: string;
   children: ReactNode;
@@ -45,7 +43,7 @@ const PageContainer: React.FC<PageContainerProps> = ({
         throw new Error('User ID not available');
       }
 
-      const response = await fetch(`${API_ENDPOINT}/generate`, {
+      const response = await fetch(`${import.meta.env.VITE_API_ENDPOINT}/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
