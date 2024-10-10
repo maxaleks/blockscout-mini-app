@@ -104,12 +104,12 @@ const AddressPage: React.FC = () => {
       error={error}
     >
       {addressData && (
-        <>
-          <div className="p-4 border-b">
+        <div className="flex flex-col h-full">
+          <div className="flex-shrink-0 p-4 border-b">
             <h2 className="text-lg font-semibold mb-2">Overview</h2>
             <div className="grid grid-cols-1 gap-2">
               <div>
-                <span className="font-medium">Hash:</span> {shortenHash(addressHash)}
+                <span className="font-medium">Hash:</span> {shortenHash(addressData.hash)}
               </div>
               <div>
                 <span className="font-medium">Balance:</span> {formatBalance(addressData.coin_balance, networks[chainId].decimals)} {networks[chainId].symbol}
@@ -119,7 +119,7 @@ const AddressPage: React.FC = () => {
               </div>
               <div className="text-center mt-1">
                 <a
-                  href={`${networks[chainId].explorerUrl}/address/${addressHash}`}
+                  href={`${networks[chainId].explorerUrl}/address/${addressData.hash}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-500 hover:text-blue-700 underline"
@@ -129,11 +129,11 @@ const AddressPage: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="p-4">
-            <h2 className="text-lg font-semibold mb-2">Tokens</h2>
-            <div className="overflow-y-auto max-h-96">
+          <div className="flex-grow flex flex-col overflow-hidden">
+            <h2 className="text-lg font-semibold p-4 bg-white">Tokens</h2>
+            <div className="flex-grow overflow-y-auto">
               {tokens.length > 0 ? (
-                <ul className="divide-y">
+                <ul className="divide-y px-4">
                   {tokens.map((token, index) => {
                     const tokenUsdValue = calculateUsdValue(token.value, token.token.exchange_rate, parseInt(token.token.decimals));
                     return (
@@ -150,11 +150,11 @@ const AddressPage: React.FC = () => {
                   })}
                 </ul>
               ) : (
-                <p className="text-center text-gray-500">No tokens found with non-zero balance and exchange rate</p>
+                <p className="text-center text-gray-500 p-4">No tokens found with non-zero balance and exchange rate</p>
               )}
             </div>
           </div>
-        </>
+        </div>
       )}
     </PageContainer>
   );

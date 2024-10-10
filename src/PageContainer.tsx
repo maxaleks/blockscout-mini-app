@@ -67,8 +67,8 @@ const PageContainer: React.FC<PageContainerProps> = ({
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <div className="flex justify-between items-center p-4 h-[60px]">
+    <div className="flex flex-col h-screen">
+      <div className="flex-shrink-0 flex justify-between items-center p-4 h-[60px] bg-white z-10">
         {title && (
           <>
             {showSearchButton ? (
@@ -100,21 +100,21 @@ const PageContainer: React.FC<PageContainerProps> = ({
           </>
         )}
       </div>
-      {loading ? (
-        <div className="flex-grow flex p-2 pt-24 justify-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-b-4 border-blue-500"></div>
-        </div>
-      ) : (
-        <div className="flex-grow flex p-2">
-          {error ? (
-            <div className="text-center text-red-500">{error}</div>
-          ) : (
-            <div className="w-full max-w-md">
-              {children}
-            </div>
-          )}
-        </div>
-      )}
+      <div className="flex-grow overflow-y-auto">
+        {loading ? (
+          <div className="flex p-2 pt-24 justify-center">
+            <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-b-4 border-blue-500"></div>
+          </div>
+        ) : (
+          <div className="h-full">
+            {error ? (
+              <div className="text-center text-red-500">{error}</div>
+            ) : (
+              children
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
