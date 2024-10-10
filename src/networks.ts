@@ -3,7 +3,7 @@ interface Network {
   decimals: number;
   symbol: string;
   logoUrl: string;
-  apiEndpoint: string;
+  explorerUrl: string;
 }
 
 const networks: { [key: string]: Network } = {
@@ -12,21 +12,21 @@ const networks: { [key: string]: Network } = {
     decimals: 18,
     symbol: "ETH",
     logoUrl: "/networks/ethereum.svg",
-    apiEndpoint: "https://eth.blockscout.com/api/v2"
+    explorerUrl: "https://eth.blockscout.com"
   },
   10: {
     name: "Optimism",
     decimals: 18,
     symbol: "ETH",
     logoUrl: "/networks/optimism.svg",
-    apiEndpoint: "https://optimism.blockscout.com/api/v2"
+    explorerUrl: "https://optimism.blockscout.com"
   },
   42161: {
     name: "Arbitrum",
     decimals: 18,
     symbol: "ETH",
     logoUrl: "/networks/arbitrum.svg",
-    apiEndpoint: "https://arbitrum.blockscout.com/api/v2"
+    explorerUrl: "https://arbitrum.blockscout.com"
   },
   // Add more networks as needed
 };

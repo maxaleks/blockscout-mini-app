@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+
 import networks from './networks';
 import PageContainer from './PageContainer';
+import { shortenHash } from './utils';
 
 interface AddressData {
   coin_balance: string;
@@ -49,8 +51,8 @@ const AddressPage: React.FC = () => {
         }
 
         const [addressResponse, tokensResponse] = await Promise.all([
-          fetch(`${network.apiEndpoint}/addresses/${addressHash}`),
-          fetch(`${network.apiEndpoint}/addresses/${addressHash}/tokens?type=ERC-20`)
+          fetch(`${network.explorerUrl}/api/v2/addresses/${addressHash}`),
+          fetch(`${network.explorerUrl}/api/v2/addresses/${addressHash}/tokens?type=ERC-20`)
         ]);
 
         if (!addressResponse.ok || !tokensResponse.ok) {
@@ -100,13 +102,23 @@ const AddressPage: React.FC = () => {
         <h2 className="text-lg font-semibold mb-2">Overview</h2>
         <div className="grid grid-cols-1 gap-2">
           <div>
-            <span className="font-medium">Hash:</span> {addressData.hash}
+            <span className="font-medium">Hash:</span> {shortenHash(addressData.hash)}
           </div>
           <div>
             <span className="font-medium">Balance:</span> {formatBalance(addressData.coin_balance, networks[chainId].decimals)} {networks[chainId].symbol}
             <span className="text-gray-500 ml-1">
               (${formatUsdValue(calculateUsdValue(addressData.coin_balance, addressData.exchange_rate, networks[chainId].decimals))})
             </span>
+          </div>
+          <div className="text-center mt-6">
+            <a
+              href={`${networks[chainId].explorerUrl}/address/${addressData.hash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 hover:text-blue-700 underline"
+            >
+              View on Blockscout
+            </a>
           </div>
         </div>
       </div>
