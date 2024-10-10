@@ -3,12 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import WebApp from '@twa-dev/sdk';
 import { Search, Share2 } from 'lucide-react';
 
+import { API_ENDPOINT } from './constants';
+
 interface PageContainerProps {
   title: string;
   children: ReactNode;
   showSearchButton?: boolean;
   showShareButton?: boolean;
-  shareLink?: string;
+  shareData?: {
+    hash: string;
+    chainId: number;
+  };
 }
 
 const PageContainer: React.FC<PageContainerProps> = ({
@@ -16,7 +21,7 @@ const PageContainer: React.FC<PageContainerProps> = ({
   children,
   showSearchButton = false,
   showShareButton = false,
-  shareLink
+  shareData
 }) => {
   const navigate = useNavigate();
 
@@ -24,9 +29,35 @@ const PageContainer: React.FC<PageContainerProps> = ({
     navigate('/');
   };
 
-  const handleShare = () => {
-    if (!shareLink) return;
-    WebApp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(shareLink)}`);
+  const handleShare = async () => {
+    if (!shareData) return;
+
+    try {
+      const userId = WebApp.initDataUnsafe.user?.id.toString();
+      if (!userId) {
+        throw new Error('User ID not available');
+      }
+
+      const response = await fetch(`${ API_ENDPOINT }/generate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ...shareData, userId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate share link');
+      }
+
+
+      const { id } = await response.json();
+      const shareUrl = `https://t.me/blockscout_test_bot/bs_test_app?startapp=${id}`;
+      WebApp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}`);
+    } catch (error) {
+      console.error('Error generating share link:', error);
+      alert('Failed to generate share link. Please try again.');
+    }
   };
 
   return (

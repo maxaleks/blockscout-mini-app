@@ -18,7 +18,7 @@ interface Transaction {
 
 const TransactionPage: React.FC = () => {
   const [searchParams] = useSearchParams();
-  const chainId = searchParams.get('chainId') || '1';
+  const chainId = Number(searchParams.get('chainId') || '1');
   const txHash = searchParams.get('hash') || '';
   const [transaction, setTransaction] = useState<Transaction | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -93,7 +93,7 @@ const TransactionPage: React.FC = () => {
       title="Transaction Details"
       showSearchButton
       showShareButton
-      shareLink={'t.me/blockscout_test_bot/bs_test_app'}
+      shareData={{ hash: txHash, chainId }}
     >
       <div className="p-4">
         <div className="mb-4">

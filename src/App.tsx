@@ -5,6 +5,8 @@ import StartPage from './StartPage';
 import TransactionPage from './TransactionPage';
 import AddressPage from './AddressPage';
 
+import { API_ENDPOINT } from './constants';
+
 const App: React.FC = () => {
   const [startRoute, setStartRoute] = useState<string | null>(null);
 
@@ -13,14 +15,35 @@ const App: React.FC = () => {
     try {
       WebApp.requestWriteAccess();
     } catch (error) {}
+
+    const handleStartParam = async (startParam: string) => {
+      try {
+        const userId = WebApp.initDataUnsafe.user?.id.toString();
+        const response = await fetch(`${ API_ENDPOINT }/info`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ id: startParam, userId }),
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch start parameter info');
+        }
+        const { hash, chainId } = await response.json();
+        if (hash.length === 42) {
+          setStartRoute(`/address?chainId=${chainId}&hash=${hash}`);
+        } else if (hash.length === 66) {
+          setStartRoute(`/transaction?chainId=${chainId}&hash=${hash}`);
+        }
+      } catch (error) {
+        console.error('Error processing start parameter:', error);
+        // Handle error (e.g., show an error message to the user)
+      }
+    };
+
     const startParam = WebApp.initDataUnsafe.start_param;
     if (startParam) {
-      const [type, chainId, hash] = startParam.split('_');
-      if (type === 'addr') {
-        setStartRoute(`/address?chainId=${chainId}&hash=${hash}`);
-      } else if (type === 'tx') {
-        setStartRoute(`/transaction?chainId=${chainId}&hash=${hash}`);
-      }
+      handleStartParam(startParam);
     }
   }, []);
 

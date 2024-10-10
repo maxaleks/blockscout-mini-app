@@ -21,7 +21,7 @@ interface Token {
 
 const AddressPage: React.FC = () => {
   const [searchParams] = useSearchParams();
-  const chainId = searchParams.get('chainId') || '1';
+  const chainId = Number(searchParams.get('chainId') || '1');
   const addressHash = searchParams.get('hash') || '';
   const [addressData, setAddressData] = useState<AddressData | null>(null);
   const [tokens, setTokens] = useState<Token[]>([]);
@@ -94,7 +94,7 @@ const AddressPage: React.FC = () => {
       title="Address Details"
       showSearchButton
       showShareButton
-      shareLink={'t.me/blockscout_test_bot/bs_test_app'}
+      shareData={{ hash: addressHash, chainId}}
     >
       <div className="p-4 border-b">
         <h2 className="text-lg font-semibold mb-2">Overview</h2>
